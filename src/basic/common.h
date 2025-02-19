@@ -26,6 +26,9 @@
 
 using ID = uint32_t;
 
+static constexpr size_t MAX_KEY_NUM = 108;
+using KeyBoardState = std::bitset<MAX_KEY_NUM>;
+
 struct Range {
 	int32_t mOffset{ 0 };
 	int32_t mCount{ -1 };

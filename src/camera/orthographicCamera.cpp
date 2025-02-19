@@ -8,7 +8,6 @@ namespace pe {
 		mBottom = bottom;
 		mNear = near;
 		mFar = far;
-
 		updateProjectionMatrix();
 	
 	}
@@ -17,5 +16,4 @@ namespace pe {
 		mProjectionMatrix = glm::ortho(mLeft, mRight, mBottom, mTop, mNear, mFar);
 		return mProjectionMatrix;
 	}
-
 }
