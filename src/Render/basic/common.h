@@ -34,3 +34,5 @@ struct Range {
 	int32_t mCount{ -1 };
 };
 
+using byte = unsigned char;
+using HashType = size_t;

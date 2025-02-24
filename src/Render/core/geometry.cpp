@@ -7,7 +7,9 @@ namespace pe {
 	}
 
 	Geometry::~Geometry() noexcept {
-		// 使用后端析构信号
+		EventBase::Ptr e = EventBase::create("geometryDispose");
+		e->mTarget = this;
+		EventDispatcher::getInstance()->dispatchEvent(e);
 	}
 
 	void Geometry::setAttribute(const std::string& name, Attributef::Ptr attribute) noexcept {

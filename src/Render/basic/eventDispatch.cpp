@@ -13,7 +13,6 @@ namespace pe{
 		if (mInstance == nullptr) {
 			mInstance = new EventDispatcher();
 		}
-
 		return mInstance;
 	}
 
@@ -69,8 +68,6 @@ namespace pe{
 
 		listenerQueue.push_back(listener);
 	}
-
-
 
 	template<typename T>
 	void EventDispatcher::removeEventListener(const std::string& name, T* target, TypedFunctionPointer<T> functionPointer) noexcept {

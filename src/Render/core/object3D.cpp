@@ -6,7 +6,9 @@ namespace pe {
 		mID = Identity::generateID();
 	};
 	Object3D::~Object3D() noexcept {
-		// 析构分发函数
+		EventBase::Ptr e = EventBase::create("objectDispose");
+		e->mTarget = this;
+		EventDispatcher::getInstance()->dispatchEvent(e);
 	}
 
 	// Position物体的中心或者一个有代表性的点

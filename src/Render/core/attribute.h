@@ -2,6 +2,7 @@
 #include "../basic/common.h"
 #include "../basic/constants.h"
 #include "../tools/identity.h"
+#include "../basic/eventDispatch.h"
 
 namespace pe {
 
@@ -83,6 +84,11 @@ namespace pe {
 	
 	template<typename T>
 	Attribute<T>::~Attribute() noexcept {
+		EventBase::Ptr e = EventBase::create("attributeDispose");
+		e->mTarget = this;
+		e->mpUserData = &mID;
+
+		EventDispatcher::getInstance()->dispatchEvent(e);
 	}
 
 	template<typename T>

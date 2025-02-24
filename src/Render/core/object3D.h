@@ -1,6 +1,7 @@
 #pragma once
 #include "../basic/common.h"
 #include "../tools/identity.h"
+#include "../basic/eventDispatch.h"
 
 namespace pe {
 	class ObjectType {

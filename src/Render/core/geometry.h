@@ -3,6 +3,7 @@
 #include "attribute.h"
 #include "../math/box3.h"
 #include "../math/sphere.h"
+#include "../basic/eventDispatch.h"
 
 namespace pe {
 	// ∂‘”¶VAO £¨ GLGeometry
