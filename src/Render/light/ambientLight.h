@@ -1,7 +1,7 @@
 #pragma once
 #include "light.h"
 
-namespace ff {
+namespace pe {
 
 	class AmbientLight:public Light {
 	public:

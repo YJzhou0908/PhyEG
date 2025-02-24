@@ -2,7 +2,7 @@
 #include "light.h"
 #include "directionalLightShadow.h"
 
-namespace ff {
+namespace pe {
 
 	class DirectionalLight :public Light {
 	public:

@@ -1,6 +1,6 @@
 #include "ambientLight.h"
 
-namespace ff {
+namespace pe {
 
 	AmbientLight::AmbientLight() noexcept {
 		mIsAmbientLight = true;

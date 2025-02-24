@@ -1,7 +1,7 @@
 #pragma once
 #include "directionalLight.h"
 
-namespace ff {
+namespace pe {
 
 	DirectionalLight::DirectionalLight() noexcept {
 		mIsDirectionalLight = true;
