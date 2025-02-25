@@ -25,7 +25,6 @@ namespace pe {
 		float mFar{ 0.0f };
 
 
-
 	};
 
 
