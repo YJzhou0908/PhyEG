@@ -3,7 +3,7 @@
 #include "../basic/config.h"
 #include "cache.h"
 
-namespace ff {
+namespace pe {
 
 	TextureLoader::TextureLoader() noexcept {}
 

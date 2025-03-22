@@ -6,7 +6,7 @@ namespace pe {
 		mIsScene = true;
 	}
 
-	Scene::~Scene noexcept{
+	Scene::~Scene() noexcept{
 	}
 
 }

@@ -7,7 +7,7 @@ namespace pe {
 
 	class GLWindow {
 	public:
-		using FrameSizeCallback = std::function<void(GLWindow*, int width, int height);
+		using FrameSizeCallback = std::function<void(GLWindow*, int width, int height)>;
 
 		using MouseMoveCallback = std::function<void(double xpos, double ypos)>;
 
@@ -51,7 +51,7 @@ namespace pe {
 		static void mouseActionCallback(GLFWwindow* window, int button, int action, int mods) noexcept;
 
 	public:
-		Renderer* mRender{ nullptr };
+		Renderer* mRenderer{ nullptr };
 
 	private:
 		int mWidth{ 0 };

@@ -1,10 +1,50 @@
-#pragma once 
+#pragma once
 #include "common.h"
+#include <stb_image.h>
 
 namespace pe {
-	enum class BufferAllocType {
-		StaticDrawBuffer,
-		DynamicDrawBuffer
+
+	using KeyboardAction = uint64_t;
+
+	static constexpr KeyboardAction WKey = 1;
+	static constexpr KeyboardAction SKey = 2;
+	static constexpr KeyboardAction AKey = 3;
+	static constexpr KeyboardAction DKey = 4;
+	static constexpr KeyboardAction KeyNONE = 31;
+
+#define DOWN	0
+#define UP		1
+
+	//key :代表了某一个按键
+	//value:代表了,我们规定的一个键盘编号
+	using KeyboardMapType = std::unordered_map<uint32_t, KeyboardAction>;
+
+	//在这里预设好,我们关心的这四个按键
+	static const KeyboardMapType KeyboardActionMap = {
+		KeyboardMapType::value_type(GLFW_KEY_W, WKey),
+		KeyboardMapType::value_type(GLFW_KEY_S, SKey),
+		KeyboardMapType::value_type(GLFW_KEY_A, AKey),
+		KeyboardMapType::value_type(GLFW_KEY_D, DKey),
+	};
+
+	enum class MouseAction :uint8_t {
+		LeftDown,
+		RightDown,
+		MiddleDown,
+		LeftUp,
+		RightUp,
+		MiddleUp,
+		NONE,
+	};
+
+	//key:当前哪个按键发生了反应
+	//value:对应的up or down, tuple来表达,tuple拥有顺序,std::get<0>拿到的就是第一个mouseAction
+	using MouseActionMapType = std::unordered_map<uint32_t, std::tuple<MouseAction, MouseAction>>;
+
+	static const MouseActionMapType MouseActionMap = {
+		MouseActionMapType::value_type(GLFW_MOUSE_BUTTON_LEFT, {MouseAction::LeftDown, MouseAction::LeftUp}),
+		MouseActionMapType::value_type(GLFW_MOUSE_BUTTON_RIGHT, {MouseAction::RightDown, MouseAction::RightUp}),
+		MouseActionMapType::value_type(GLFW_MOUSE_BUTTON_MIDDLE, {MouseAction::MiddleDown, MouseAction::MiddleUp}),
 	};
 
 	enum class DataType {
@@ -40,47 +80,90 @@ namespace pe {
 		return DataType::FloatType;
 	}
 
-	using KeyboardAction = uint64_t;
+	static unsigned int toGL(const DataType& value) {
+		switch (value) {
+		case DataType::UnsignedByteType:
+			return GL_UNSIGNED_BYTE;
+		case DataType::FloatType:
+			return GL_FLOAT;
+		case DataType::ByteType:
+			return GL_BYTE;
+		case DataType::Int32Type:
+			return GL_INT;
+		case DataType::UInt32Type:
+			return GL_UNSIGNED_INT;
+		default:
+			std::cout << "bad" << std::endl;
+			return 0;
+		}
+	}
 
-	static constexpr KeyboardAction WKey = 1;
-	static constexpr KeyboardAction SKey = 2;
-	static constexpr KeyboardAction AKey = 3;
-	static constexpr KeyboardAction DKey = 4;
-	static constexpr KeyboardAction KeyNONE = 31;
+	static size_t toSize(const DataType& value) {
+		switch (value) {
+		case DataType::UnsignedByteType:
+			return sizeof(unsigned char);
+		case DataType::FloatType:
+			return sizeof(float);
+		case DataType::ByteType:
+			return sizeof(char);
+		case DataType::Int32Type:
+			return sizeof(int);
+		case DataType::UInt32Type:
+			return sizeof(uint32_t);
+		default:
+			return 0;
+		}
+	}
 
-#define DOWN	0
-#define UP		1
+	//events-----------------
+	static const std::string DISPOSE = "dispose";
 
-	//key :代表了某一个按键
-	//value: 对应的Action编号
-	using KeyboardMapType = std::unordered_map<uint32_t, KeyboardAction>;
-
-	static const KeyboardMapType KeyboardActionMap = {
-		KeyboardMapType::value_type(GLFW_KEY_W, WKey),
-		KeyboardMapType::value_type(GLFW_KEY_S, SKey),
-		KeyboardMapType::value_type(GLFW_KEY_A, AKey),
-		KeyboardMapType::value_type(GLFW_KEY_D, DKey),
+	//material---------------
+	namespace MaterialName {
+		static const std::string Material = "Material";
+		static const std::string MeshBasicMaterial = "MeshBasicMaterial";
+		static const std::string MeshPhongMaterial = "MeshPhongMaterial";
+		static const std::string CubeMaterial = "CubeMaterial";
+		static const std::string DepthMaterial = "DepthMaterial";
 	};
 
 
-	enum class MouseAction :uint8_t {
-		LeftDown,
-		RightDown,
-		MiddleDown,
-		LeftUp,
-		RightUp,
-		MiddleUp,
-		NONE,
+
+	//geometry---------------
+	enum class BufferAllocType {
+		StaticDrawBuffer,
+		DynamicDrawBuffer
 	};
 
-	using MouseActionMapType = std::unordered_map<uint32_t, std::tuple<MouseAction, MouseAction>>;
+	static uint32_t toGL(const BufferAllocType& value) {
+		switch (value) {
+		case BufferAllocType::StaticDrawBuffer:
+			return GL_STATIC_DRAW;
+		case BufferAllocType::DynamicDrawBuffer:
+			return GL_DYNAMIC_DRAW;
+		default:
+			return 0;
+		}
+	}
 
-	static const MouseActionMapType MouseActionMap = {
-		MouseActionMapType::value_type(GLFW_MOUSE_BUTTON_LEFT, {MouseAction::LeftDown, MouseAction::LeftUp}),
-		MouseActionMapType::value_type(GLFW_MOUSE_BUTTON_RIGHT, {MouseAction::RightDown, MouseAction::RightUp}),
-		MouseActionMapType::value_type(GLFW_MOUSE_BUTTON_MIDDLE, {MouseAction::MiddleDown, MouseAction::MiddleUp}),
+	enum class BufferType {
+		ArrayBuffer,
+		IndexBuffer
 	};
 
+	static uint32_t toGL(const BufferType& value) {
+		switch (value) {
+		case BufferType::ArrayBuffer:
+			return GL_ARRAY_BUFFER;
+		case BufferType::IndexBuffer:
+			return GL_ELEMENT_ARRAY_BUFFER;
+		default:
+			return 0;
+		}
+	}
+
+
+	//texture----------------
 	static constexpr uint32_t MAX_TEXUTRE_COUNT = 8;
 	static constexpr GLuint MAX_TEXTURE = GL_TEXTURE0 + 7;
 
@@ -122,6 +205,16 @@ namespace pe {
 		}
 	}
 
+	static uint32_t toStbImageFormat(const TextureFormat& format) {
+		switch (format) {
+		case TextureFormat::RGB:
+			return STBI_rgb;
+		case TextureFormat::RGBA:
+			return STBI_rgb_alpha;
+		default:
+			return 0;
+		}
+	}
 
 	static uint32_t toPixelSize(const TextureFormat& format) {
 		switch (format) {
@@ -168,7 +261,7 @@ namespace pe {
 	}
 
 	enum class TextureFilter {
-		LinearFilter, 
+		LinearFilter,
 		NearestFilter,
 	};
 
@@ -314,11 +407,16 @@ namespace pe {
 		}
 	}
 
-	namespace MaterialName {
-		static const std::string Material = "Material";
-		static const std::string MeshBasicMaterial = "MeshBasicMaterial";
-		static const std::string MeshPhongMaterial = "MeshPhongMaterial";
-		static const std::string CubeMaterial = "CubeMaterial";
-		static const std::string DepthMaterial = "DepthMaterial";
+	//attributes
+	static const std::unordered_map<std::string, uint32_t>  LOCATION_MAP = {
+		{"position", 0},
+		{"normal", 1},
+		{"color", 2},
+		{"uv", 3},
+		{"skinIndex", 4},
+		{"skinWeight", 5},
+		{"tangent", 6},
+		{"bitangent", 7}
 	};
+
 }

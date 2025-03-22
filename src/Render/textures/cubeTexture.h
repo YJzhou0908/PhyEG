@@ -5,7 +5,7 @@
 
 namespace pe {
 
-	class CubeTexture :public Texture {
+	class CubeTexture:public Texture {
 	public:
 		static const uint32_t CUBE_TEXTURE_COUNT = 6;
 		using Ptr = std::shared_ptr<CubeTexture>;

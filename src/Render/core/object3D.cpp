@@ -174,7 +174,7 @@ namespace pe {
 		}
 	}
 
-	glm::mat4 Object3D::updateWorldMatrix(bool updateParent = false, bool updateChildren = false) noexcept {
+	glm::mat4 Object3D::updateWorldMatrix(bool updateParent , bool updateChildren) noexcept {
 		//更新的时候要把父亲和孩子都更新了
 			//检查有没有父节点
 		if (!mParent.expired() && updateParent) {
@@ -234,7 +234,7 @@ namespace pe {
 		}
 
 		// week_ptr避免了孩子引用父亲的冲突
-		child->mParent = shared_form_this();
+		child->mParent = shared_from_this();
 
 		//查找当前节点下，是否已经加入该Child
 		auto iter = std::find(mChildren.begin(), mChildren.end(), child);

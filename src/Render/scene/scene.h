@@ -7,7 +7,7 @@
 namespace pe {
 	class Scene : public Object3D {
 	public:
-		using Ptr = std::shared_ptr<Object3D>;
+		using Ptr = std::shared_ptr<Scene>;
 
 		static Ptr create() {
 			return std::make_shared<Scene>();

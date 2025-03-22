@@ -1,7 +1,7 @@
-#inlude "./identity.h"
+#include "./identity.h"
 
 namespace pe {
 
-	ID Identity::IDPos = 0;
+	ID Identity::mCurrentID = 0;
 
 }

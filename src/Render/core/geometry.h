@@ -3,11 +3,11 @@
 #include "attribute.h"
 #include "../math/box3.h"
 #include "../math/sphere.h"
-#include "../basic/eventDispatch.h"
+#include "../basic/eventDispatcher.h"
 
 namespace pe {
 	// 对应VAO ， GLGeometry
-	class Geometry : public enable_shared_from_this<Geometry> {
+	class Geometry : public std::enable_shared_from_this<Geometry> {
 	public:
 		// 通过字符串可以索引到对应的Attribute的前端。
 		using AttributeMap = std::unordered_map<std::string, Attributef::Ptr>;

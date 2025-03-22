@@ -7,17 +7,15 @@ file(GLOB copylist "./assets" )
 file(COPY ${copylist} DESTINATION ${CMAKE_BINARY_DIR})
 
 include_directories(
-SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/include
+	SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/include ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 link_directories(
-	SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/libs/glfw
-	SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/libs/assimp
+	SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/libs/glfw ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/libs/assimp
 )
 
 
-# add_subdirectory(src)
+add_subdirectory(src)
 
-# add_executable(triangle "examples/triangle.cpp")
- 
-# target_link_libraries
+add_executable(triangle "./examples/triangle.cpp") 
+target_link_libraries(triangle PE_lib glfw3.lib assimp-vc143-mt.lib )

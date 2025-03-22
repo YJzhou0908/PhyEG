@@ -1,7 +1,7 @@
 #pragma once
 #include "../basic/common.h"
 #include "../tools/identity.h"
-#include "../basic/eventDispatch.h"
+#include "../basic/eventDispatcher.h"
 
 namespace pe {
 	class ObjectType {
@@ -18,7 +18,7 @@ namespace pe {
 		bool mIsDirectionalLight{ false };
 	};
 
-	class Object3D : public enable_shared_from_this<Object3D>, public ObjectType{
+	class Object3D : public std::enable_shared_from_this<Object3D>, public ObjectType{
 	public:
 		using Ptr = std::shared_ptr<Object3D>;
 		static Ptr create() {
@@ -135,6 +135,6 @@ namespace pe {
 
 		glm::mat3 mNormalMatrix = glm::mat3(1.0f);
 
-	}
+	};
 
 }

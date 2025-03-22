@@ -2,7 +2,7 @@
 #include "loader.h"
 #include "../textures/texture.h"
 
-namespace ff {
+namespace pe {
 
 	class TextureLoader:public Loader {
 	public:

@@ -5,10 +5,10 @@ namespace pe {
 	class Identity {
 	public:
 		static ID generateID() {
-			return IDPos++;
+			return mCurrentID++;
 		};
 	private:
-		static ID IDPos{0};
+		static ID mCurrentID;
 
 
 	};

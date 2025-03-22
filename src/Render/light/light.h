@@ -2,10 +2,11 @@
 #include "../basic/common.h"
 #include "../basic/constants.h"
 #include "../core/object3D.h"
+#include "lightShadow.h"
 
 namespace pe {
 
-	class Light :public Objec3D {
+	class Light :public Object3D {
 	public:
 		using Ptr = std::shared_ptr<Light>;
 		static Ptr create() {

@@ -1,6 +1,6 @@
 #pragma once 
 #include "cameraControl.h"
-#include "../baisc/constants.h"
+#include "../basic/constants.h"
 
 namespace pe {
 

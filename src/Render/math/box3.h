@@ -1,6 +1,6 @@
 #pragma once 
-#include "../../basic/common.h"
-#include "../../core/attribute.h"
+#include "../basic/common.h"
+#include "../core/attribute.h"
 namespace pe {
 
 	class Box3 {

@@ -1,9 +1,11 @@
+#pragma once
 #include "../basic/common.h"
 #include "../basic/constants.h"
 #include "source.h"
 
 namespace pe {
 
+	//负责给出纹理贴图描述信息
 	class Texture {
 	public:
 		//智能指针管理
@@ -88,7 +90,5 @@ namespace pe {
 
 	protected:
 		ID	mID{ 0 };
-
 	};
-
 }

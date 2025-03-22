@@ -1,16 +1,19 @@
 #pragma once 
-#include "../basic/common.h"
-#include "../core/object3D.h"
+#include "camera.h"
 
 namespace pe {
-	class OrthographicCamera : public Object3D {
+	class OrthographicCamera : public Camera {
 	public:
 		using Ptr = std::shared_ptr<OrthographicCamera>;
 
 
-		OrthographicCamera(float left, float right, float bottom, float top, float near, float far) noexcept;
-
 		~OrthographicCamera() noexcept;
+
+		static Ptr create(float left, float right, float bottom, float top, float near, float far) {
+			return std::make_shared <OrthographicCamera>(left, right, bottom, top, near, far);
+		}
+
+		OrthographicCamera(float left, float right, float bottom, float top, float near, float far) noexcept;
 
 	private:
 		glm::mat4 updateProjectionMatrix() noexcept override;

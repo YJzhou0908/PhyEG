@@ -17,11 +17,13 @@
 #include <random>
 #include <any>
 #include <chrono>
+#include <memory>
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/matrix_decompose.hpp"
+#include "stb_image.h"
 
 
 using ID = uint32_t;

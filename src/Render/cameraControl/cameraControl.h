@@ -1,6 +1,7 @@
 #pragma once 
 #include "../basic/common.h"
 #include "../basic/constants.h"
+#include "../camera/camera.h"
 namespace pe {
 
 	class CameraControl {
@@ -20,4 +21,5 @@ namespace pe {
 	protected:
 		Camera::Ptr	mCamera{ nullptr };//正交相机  透视相机
 
+	};
 }

@@ -2,6 +2,8 @@
 #include "cache.h"
 #include <stb_image.h>
 #include "../basic/config.h"
+#include "../basic/common.h"
+#include "../basic/constants.h"
 
 namespace pe {
 

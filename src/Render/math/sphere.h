@@ -1,5 +1,5 @@
 #pragma once
-#include "../../basic/common.h"
+#include "../basic/common.h"
 
 namespace pe {
 
@@ -26,6 +26,11 @@ namespace pe {
 
 			float maxScale = std::max(std::max(scaleX, scaleY), scaleZ);
 			mRadius *= maxScale;
+		}
+
+		void copy(const Sphere::Ptr& other) {
+			mCenter = other->mCenter;
+			mRadius = other->mRadius;
 		}
 
 	public:

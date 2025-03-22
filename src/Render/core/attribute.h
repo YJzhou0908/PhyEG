@@ -2,7 +2,7 @@
 #include "../basic/common.h"
 #include "../basic/constants.h"
 #include "../tools/identity.h"
-#include "../basic/eventDispatch.h"
+#include "../basic/eventDispatcher.h"
 
 namespace pe {
 
@@ -20,7 +20,7 @@ namespace pe {
 		Attribute(const std::vector<T> &data, uint32_t itemSize, BufferAllocType  bufferAllocType = BufferAllocType::StaticDrawBuffer) noexcept;
 		~Attribute() noexcept;
 
-		auto getID() const noexcept { return mID };
+		auto getID() const noexcept { return mID; }
 
 		auto getData() const noexcept { return mData; }
 
@@ -73,7 +73,7 @@ namespace pe {
 	};
 
 	template<typename T>
-	Attribute<T>::Attribute(const std::vector<T>& data, uint32_t itemSize, BufferAllocType  bufferAllocType = BufferAllocType::StaticDrawBuffer) noexcept {
+	Attribute<T>::Attribute(const std::vector<T>& data, uint32_t itemSize, BufferAllocType  bufferAllocType) noexcept {
 		mID = Identity::generateID();
 		mData = data;
 		mItemSize = itemSize;
@@ -101,14 +101,14 @@ namespace pe {
 	template<typename T>
 	void Attribute<T>::setY(const uint32_t& index, T value) noexcept {
 		assert(index < mCount);
-		mData[index * mItemSize + 1] = x;
+		mData[index * mItemSize + 1] = value;
 		mNeedsUpdate = true;
 	}
 
 	template<typename T>
 	void Attribute<T>::setZ(const uint32_t& index, T value) noexcept {
 		assert(index < mCount);
-		mData[index * mItemSize + 2] = x;
+		mData[index * mItemSize + 2] = value;
 		mNeedsUpdate = true;
 	}
 

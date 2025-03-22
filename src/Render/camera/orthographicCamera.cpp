@@ -12,6 +12,8 @@ namespace pe {
 	
 	}
 
+	OrthographicCamera::~OrthographicCamera() noexcept {}
+
 	glm::mat4 OrthographicCamera::updateProjectionMatrix() noexcept {
 		mProjectionMatrix = glm::ortho(mLeft, mRight, mBottom, mTop, mNear, mFar);
 		return mProjectionMatrix;
