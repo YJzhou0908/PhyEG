@@ -18,4 +18,7 @@ link_directories(
 add_subdirectory(src)
 
 add_executable(triangle "./examples/triangle.cpp") 
+add_executable(material "./examples/materials.cpp")
+
 target_link_libraries(triangle PE_lib glfw3.lib assimp-vc143-mt.lib )
+target_link_libraries(material PE_lib glfw3.lib assimp-vc143-mt.lib )

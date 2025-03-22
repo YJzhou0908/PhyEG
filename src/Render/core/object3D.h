@@ -35,7 +35,7 @@ namespace pe {
 		// Position物体的中心或者一个有代表性的点
 		void setPosition(float x, float y, float z) noexcept;
 
-		void setPosition(glm::vec3& position) noexcept;
+		void setPosition(const glm::vec3& position) noexcept;
 
 		void setQuaternion(float x, float y, float z, float w) noexcept;
 

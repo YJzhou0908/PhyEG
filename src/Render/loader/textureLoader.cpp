@@ -1,4 +1,5 @@
 #include "textureLoader.h"
+#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include "../basic/config.h"
 #include "cache.h"
@@ -27,8 +28,10 @@ namespace pe {
 		}
 		else {
 			source = Source::create();
+			//以下数据都是新数据,所以false掉
 			source->mNeedsUpdate = false;
 
+			//使用引用类型，可以直接对data进行更改，结果会同步到source的Data当中
 			auto& data = source->mData;
 
 			int			picType = 0;
@@ -57,6 +60,7 @@ namespace pe {
 				//记录了整个数据的大小
 				uint32_t dataInSize = 0;
 
+				//一个fbx模型有可能打包进来jpg，带有压缩格式的图片情况下，height可能为0，width就代表了整个图片的大小
 				if (!heightIn) {
 					dataInSize = widthIn;
 				}
@@ -64,7 +68,7 @@ namespace pe {
 					dataInSize = widthIn * heightIn;
 				}
 
-			
+				//我们现在拿到的dataIn，并不是展开的位图数据，有可能是一个jpg png等格式的图片数据流
 				bits = stbi_load_from_memory(dataIn, dataInSize, &width, &height, &picType, toStbImageFormat(TextureFormat::RGBA));
 			}
 
@@ -78,6 +82,7 @@ namespace pe {
 				memcpy(data.data(), bits, dataSize);
 			}
 
+			//此时，bits指向的由stbimage给到的内存数据，就delete了
 			stbi_image_free(bits);
 
 			source->mWidth = width;

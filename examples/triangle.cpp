@@ -35,13 +35,13 @@ static void onResize(int width, int height) {
 
 int main() {
 	std::vector<float> positions = {
-		-0.5f, 0.0f, 0.0f,
-		0.0f, 0.5f, 0.0f,
-		0.5f, 0.0f, 0.0f
+		-0.5f, -0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f,
+		0.0f, 0.5f, 0.0f
 	};
 
 	std::vector<float> colors = {
-		1.0f, 0.0f, 0.0f,
+		1.0f,0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f,
 		0.0f, 0.0f, 1.0f
 	};
@@ -70,7 +70,7 @@ int main() {
 	//创建透视投影摄像机near far 宽高比，视角 位置
 	auto camera = pe::PerspectiveCamera::create(0.1f, 100.0f, (float)WIDTH / (float)(HEIGHT), 60.0f);
 	camera->setPosition(0.0f, 0.0f, 1.0f);
-
+	//camera->lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,0.0f,0.0f));
 	//创建渲染器
 	pe::Renderer::Descriptor rDc;
 	rDc.mWidth = WIDTH;
@@ -78,7 +78,7 @@ int main() {
 	pe::Renderer::Ptr renderer = pe::Renderer::create(rDc);
 
 	//设置背景清除色，类似与glClearColor
-	renderer->setClearColor(0.94, 1.0, 0.94, 1.0);
+	renderer->setClearColor(0.1, 0.1, 0.1, 1.0);
 
 	renderer->setMouseActionCallback(onMouseAction);
 	renderer->setKeyboardActionCallBack(onKeyboardAction);

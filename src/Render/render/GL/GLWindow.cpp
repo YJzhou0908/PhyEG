@@ -16,7 +16,7 @@ namespace pe {
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 
 		//´´½¨´°Ìå
-		mWindow = glfwCreateWindow(mWidth, mHeight, "FunForestEngine window", nullptr, nullptr);
+		mWindow = glfwCreateWindow(mWidth, mHeight, "Main Window", nullptr, nullptr);
 		if (!mWindow) {
 			std::cerr << "Error: failed to create window" << std::endl;
 			glfwTerminate();

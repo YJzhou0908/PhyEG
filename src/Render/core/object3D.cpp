@@ -1,91 +1,80 @@
 #include "object3D.h"
+#include "../tools/identity.h"
+#include "../basic/eventDispatcher.h"
 
 namespace pe {
 
 	Object3D::Object3D() noexcept {
 		mID = Identity::generateID();
-	};
+	}
+
 	Object3D::~Object3D() noexcept {
 		EventBase::Ptr e = EventBase::create("objectDispose");
 		e->mTarget = this;
 		EventDispatcher::getInstance()->dispatchEvent(e);
 	}
 
-	// Position物体的中心或者一个有代表性的点
 	void Object3D::setPosition(float x, float y, float z) noexcept {
-		mPosition.x = x;
-		mPosition.y = y;
-		mPosition.z = z;
+		setPosition(glm::vec3(x, y, z));
 	}
 
-	void Object3D::setPosition(glm::vec3& position) noexcept {
-		mPosition = position;
-
+	void Object3D::setPosition(const glm::vec3& position) noexcept {
+		//在glm情况下，列优先存储:a e i m b f j n c g k o d h l p
+		//在glm情况下，列优先存储:a b c d e f g h i j....
 		//a b c d
 		//e f g h
 		//i j k l
 		//m n o p
-		// 第四列是位置 或者说是平移变量
+		//获取第三列
 		mLocalMatrix[3].x = position.x;
 		mLocalMatrix[3].y = position.y;
 		mLocalMatrix[3].z = position.z;
 
+		mPosition = position;
 	}
 
 	void Object3D::setQuaternion(float x, float y, float z, float w) noexcept {
+		//在四元数情况下，glm的初始化，w xyz
+		glm::quat quaternion(w, x, y, z);
 
-		//a b c d
-		//e f g h
-		//i j k l
-		//m n o p
-
-		// 根据Quaternion生成旋转矩阵
-		glm::quat qua(w, x, y, z);
-
-		glm::mat4 rotateMatrix = glm::mat4_cast(qua);
-
-		// 前三列是scale和rotate结合的
+		//考虑到，localMatrix可能已经被施加了scale方面的变换
 		float scaleX = glm::length(glm::vec3(mLocalMatrix[0]));
 		float scaleY = glm::length(glm::vec3(mLocalMatrix[1]));
 		float scaleZ = glm::length(glm::vec3(mLocalMatrix[2]));
 
+		//将glm的四元数转换为一个旋转矩阵
+		glm::mat4 rotateMatrix = glm::mat4_cast(quaternion);
+
+		//将scale变换恢复进去
 		mLocalMatrix[0] = rotateMatrix[0] * scaleX;
 		mLocalMatrix[1] = rotateMatrix[1] * scaleY;
-		mLocalMatrix[2] = rotateMatrix[2] * scaleZ;
-	}
+		mLocalMatrix[2] = rotateMatrix[2] * scaleX;
 
-
-	void Object3D::decompose() noexcept{
-		
-		glm::vec3 skew;
-		glm::vec4 perspective;
-
-		//是将变换矩阵当中的参数们，抽离出来 
-		glm::decompose(mLocalMatrix, mScale, mQuaternion, mPosition, skew, perspective);
-		
-	}
-
-	void Object3D::setScale(float x, float y, float z) noexcept {
-		
-		// 先把数据取出来，然后归一化，然后再乘
-		auto xcol = glm::normalize(glm::vec3(mLocalMatrix[0])) * x;
-		auto ycol = glm::normalize(glm::vec3(mLocalMatrix[1])) * y;
-		auto zcol = glm::normalize(glm::vec3(mLocalMatrix[2])) * z;
-
-		mLocalMatrix[0] = glm::vec4(xcol, 0.0f);
-		mLocalMatrix[1] = glm::vec4(ycol, 0.0f);
-		mLocalMatrix[2] = glm::vec4(zcol, 0.0f);
-
-		// 处理之后，要将处理数据保存起来
 		decompose();
 	}
 
-	// 这些旋转都是相对于localMatrix来做操作，最后会把这个localMatrix转移到摄像机坐标系下。
+	void Object3D::setScale(float x, float y, float z) noexcept {
+
+		//拿到某一列，normalize去掉之前的scale影响,再乘以当前的相关scale
+		auto col0 = glm::normalize(glm::vec3(mLocalMatrix[0])) * x;
+		auto col1 = glm::normalize(glm::vec3(mLocalMatrix[1])) * y;
+		auto col2 = glm::normalize(glm::vec3(mLocalMatrix[2])) * z;
+
+		//将设置好的前三列，重新设置到localmatrix
+		mLocalMatrix[0] = glm::vec4(col0, 0.0f);
+		mLocalMatrix[1] = glm::vec4(col1, 0.0f);
+		mLocalMatrix[2] = glm::vec4(col2, 0.0f);
+
+		decompose();
+	}
+
+
 	void Object3D::rotateX(float angle) noexcept {
+		//首先获取到当前模型状态下的右侧方向
 		glm::vec3 rotateAxis = glm::vec3(mLocalMatrix[0]);
 
-		glm::mat4 rotateMatrix = glm::rotate(glm::mat4(1.0f),glm::radians(angle), rotateAxis);
-
+		//针对这个右侧方向作为旋转轴来进行旋转,angle正负有意义，当angle>0, 当你冲着旋转轴看，逆时针旋转
+		glm::mat4 rotateMatrix = glm::rotate(glm::mat4(1.0), glm::radians(angle), rotateAxis);
 		mLocalMatrix = rotateMatrix * mLocalMatrix;
 
 		decompose();
@@ -93,9 +82,7 @@ namespace pe {
 
 	void Object3D::rotateY(float angle) noexcept {
 		glm::vec3 rotateAxis = glm::vec3(mLocalMatrix[1]);
-
-		glm::mat4 rotateMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(angle), rotateAxis);
-
+		glm::mat4 rotateMatrix = glm::rotate(glm::mat4(1.0), glm::radians(angle), rotateAxis);
 		mLocalMatrix = rotateMatrix * mLocalMatrix;
 
 		decompose();
@@ -103,16 +90,20 @@ namespace pe {
 
 	void Object3D::rotateZ(float angle) noexcept {
 		glm::vec3 rotateAxis = glm::vec3(mLocalMatrix[2]);
-
-		glm::mat4 rotateMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(angle), rotateAxis);
-
+		glm::mat4 rotateMatrix = glm::rotate(glm::mat4(1.0), glm::radians(angle), rotateAxis);
 		mLocalMatrix = rotateMatrix * mLocalMatrix;
 
 		decompose();
 	}
 
+	//再上一次的基础上旋转
+	void Object3D::rotateAroundAxis(const glm::vec3& axis, float angle) noexcept {
+		mLocalMatrix = glm::rotate(mLocalMatrix, glm::radians(angle), axis);
 
-	// 绕轴重新旋转
+		decompose();
+	}
+
+	//将旋转清空，重新旋转
 	void Object3D::setRotateAroundAxis(const glm::vec3& axis, float angle) noexcept {
 		glm::mat4 rotateMatrix = glm::rotate(glm::mat4(1.0), glm::radians(angle), axis);
 
@@ -122,6 +113,7 @@ namespace pe {
 		float scaleZ = glm::length(glm::vec3(mLocalMatrix[2]));
 		glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0), glm::vec3(scaleX, scaleY, scaleZ));
 
+		//列相等
 		mLocalMatrix[0] = rotateMatrix[0];
 		mLocalMatrix[1] = rotateMatrix[1];
 		mLocalMatrix[2] = rotateMatrix[2];
@@ -129,38 +121,38 @@ namespace pe {
 		mLocalMatrix *= scaleMatrix;
 
 		decompose();
-
 	}
 
-	void Object3D::rotateAroundAxis(const glm::vec3& axis, float angle) noexcept {
-
-		mLocalMatrix = glm::rotate(mLocalMatrix, glm::radians(angle), axis);
-		decompose();
-	}
-
-	// 看向的坐标 及 头顶的坐标
 	void Object3D::lookAt(const glm::vec3& target, const glm::vec3& up) noexcept {
-		// 确保scale不变
-	
+		//decompose scale
 		float scaleX = glm::length(glm::vec3(mLocalMatrix[0]));
 		float scaleY = glm::length(glm::vec3(mLocalMatrix[1]));
 		float scaleZ = glm::length(glm::vec3(mLocalMatrix[2]));
-		// 获取当前的位置计算-z方向
-		// up向量是一个参考方向，该方向一般设置为glm::vec3(0.0f, +/-1.0f, 0.0f)
+
 		glm::vec3 position = glm::vec3(mLocalMatrix[3]);
 
-		glm::vec3 targetDirection = glm::normalize(glm::vec3(target - position));
-		glm::vec3 rightDirection = glm::normalize(glm::cross(up, targetDirection));
-		glm::vec3 upDirection = glm::normalize(glm::cross(rightDirection, targetDirection));
+		//make local coordinate
+		auto nTarget = glm::normalize(target - position) * scaleZ;
+		auto nRight = glm::normalize(glm::cross(up, -nTarget)) * scaleX;
+		auto nUp = glm::normalize(glm::cross(nRight, nTarget)) * scaleY;
 
-		// 设置localMatrix
-		mLocalMatrix[0] = glm::vec4(-rightDirection, 0.0f) * scaleX;
-		mLocalMatrix[1] = glm::vec4(upDirection, 0.0f) * scaleY;
-		mLocalMatrix[2] = glm::vec4(-targetDirection, 0.0f) * scaleZ;
+
+		mLocalMatrix[0] = glm::vec4(nRight, 0.0f);
+		mLocalMatrix[1] = glm::vec4(nUp, 0.0f);
+		mLocalMatrix[2] = glm::vec4(-nTarget, 0.0f);
 		mLocalMatrix[3] = glm::vec4(position, 1.0f);
 
 		decompose();
-		
+	}
+
+	void Object3D::setLocalMatrix(const glm::mat4& localMatrix) noexcept {
+		mLocalMatrix = localMatrix;
+
+		decompose();
+	}
+
+	void Object3D::setWorldMatrix(const glm::mat4& worldMatrix) noexcept {
+		mWorldMatrix = worldMatrix;
 	}
 
 	void Object3D::updateMatrix() noexcept {
@@ -174,9 +166,10 @@ namespace pe {
 		}
 	}
 
-	glm::mat4 Object3D::updateWorldMatrix(bool updateParent , bool updateChildren) noexcept {
-		//更新的时候要把父亲和孩子都更新了
-			//检查有没有父节点
+	//通过层级matrix相乘，得到最后的转换到世界坐标系的矩阵
+	glm::mat4 Object3D::updateWorldMatrix(bool updateParent, bool updateChildren) noexcept {
+
+		//检查有没有父节点
 		if (!mParent.expired() && updateParent) {
 			auto parent = mParent.lock();//拿到父节点的sharedPtr
 			parent->updateWorldMatrix(true, false);//调用父节点的worldMatrix升级更新
@@ -202,73 +195,39 @@ namespace pe {
 		}
 
 		return mWorldMatrix;
-	
 	}
 
+	//传入摄像机viewMatrix
 	glm::mat4 Object3D::updateModelViewMatrix(const glm::mat4& viewMatrix) noexcept {
 		mModelViewMatrix = viewMatrix * mWorldMatrix;
+
 		return mModelViewMatrix;
 	}
 
-	// 发现矩阵是MV矩阵转置的逆矩阵
 	glm::mat3 Object3D::updateNormalMatrix() noexcept {
 		//normalMatrix 由于存在scale的影响，不能直接变换，否则normal会无法保证垂直于表面
 		mNormalMatrix = glm::transpose(glm::inverse(glm::mat3(mModelViewMatrix)));
+
 		return mNormalMatrix;
 	}
 
-
-	void Object3D::setLocalMatrix(const glm::mat4& localMatrix) noexcept {
-		mLocalMatrix = localMatrix;
-	}
-
-	void Object3D::setWorldMatrix(const glm::mat4& worldMatrix) noexcept {
-		mWorldMatrix = worldMatrix;
-	}
-
-	//向当前的Object3D里面，加入子节点
-	void Object3D::addChild(const Object3D::Ptr& child) noexcept {
-		// 确认不是自己
-		if (child == shared_from_this()) {
-			return;
-		}
-
-		// week_ptr避免了孩子引用父亲的冲突
-		child->mParent = shared_from_this();
-
-		//查找当前节点下，是否已经加入该Child
-		auto iter = std::find(mChildren.begin(), mChildren.end(), child);
-
-		//iterator迭代器，如果找到，就会返回当前这个child对应到数组中相同值的iterator
-		if (iter != mChildren.end()) return;
-
-		mChildren.push_back(child);
-	}
-
-
-
-	// 相对于父亲的位置
 	glm::vec3 Object3D::getPosition() const noexcept {
 		return glm::vec3(mLocalMatrix[3]);
 	}
 
 	glm::vec3 Object3D::getWorldPosition() const noexcept {
 		return glm::vec3(mWorldMatrix[3]);
-	
 	}
 
 	glm::vec3 Object3D::getLocalDirection() const noexcept {
-		// 看向自己的-z方向
 		return glm::normalize(-glm::vec3(mLocalMatrix[2]));
 	}
 
 	glm::vec3 Object3D::getWorldDirection() const noexcept {
-		//  
 		return glm::normalize(-glm::vec3(mWorldMatrix[2]));
 	}
 
 	glm::vec3 Object3D::getUp() const noexcept {
-		// 看向自己的-z，头顶默认是自己的y，获取头顶的世界坐标还得乘worldMatrix
 		return glm::normalize(glm::vec3(mLocalMatrix[1]));
 	}
 
@@ -292,14 +251,37 @@ namespace pe {
 		return mNormalMatrix;
 	}
 
-	const std::vector<Object3D::Ptr>& Object3D::getChildren() const noexcept {
-		return mChildren;
-	
+	void Object3D::addChild(const Object3D::Ptr& child) noexcept {
+		//首先确认加入的子节点并不是自己
+		if (child == shared_from_this()) {
+			return;
+		}
+
+		//给到child的是一个自身的智能指针，child是用WeakPtr来接纳的，避免了循环引用
+		child->mParent = shared_from_this();
+
+		//查找当前节点下，是否已经加入了本Child
+		auto iter = std::find(mChildren.begin(), mChildren.end(), child);
+
+		//iterator迭代器，如果找到，就会返回当前这个child对应到数组中相同值的iterator
+		if (iter != mChildren.end()) return;
+
+		mChildren.push_back(child);
 	}
 
-	ID Object3D::getID() const noexcept { return mID; }
+	const std::vector<Object3D::Ptr>& Object3D::getChildren() const noexcept {
+		return mChildren;
+	}
 
+	ID Object3D::getID() const noexcept {
+		return mID;
+	}
 
+	void Object3D::decompose() noexcept {
+		glm::vec3 skew;
+		glm::vec4 perspective;
+
+		//是将变换矩阵当中的参数们，抽离出来 
+		glm::decompose(mLocalMatrix, mScale, mQuaternion, mPosition, skew, perspective);
+	}
 }
-
-
